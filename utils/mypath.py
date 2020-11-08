@@ -12,7 +12,7 @@ class MyPath(object):
         assert(database in db_names)
 
         if database == 'cifar-10':
-            return '/path/to/cifar-10/'
+            return r'E:\datasets\cifar-10'
         
         elif database == 'cifar-20':
             return '/path/to/cifar-20/'
