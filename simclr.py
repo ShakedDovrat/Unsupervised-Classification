@@ -29,15 +29,13 @@ args = parser.parse_args()
 
 
 def main():
-    pretrained_model_path = r"E:\code\Unsupervised-Classification\output\cifar-10\pretext\checkpoint.pth.tar"
-
     # Retrieve config file
     p = create_config(args.config_env, args.config_exp)
     print(colored(p, 'red'))
     
     # Model
     print(colored('Retrieve model', 'blue'))
-    model = get_model(p, pretrained_model_path)
+    model = get_model(p)
     print('Model is {}'.format(model.__class__.__name__))
     print('Model parameters: {:.2f}M'.format(sum(p.numel() for p in model.parameters()) / 1e6))
     print(model)

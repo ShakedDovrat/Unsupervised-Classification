@@ -141,6 +141,11 @@ def get_train_dataset(p, transform, to_augmented_dataset=False,
         subset_file = './data/imagenet_subsets/%s.txt' %(p['train_db_name'])
         dataset = ImageNetSubset(subset_file=subset_file, split='train', transform=transform)
 
+    # elif p['train_db_name'] == 'celeb-a':
+    #     torchvision.datasets.CelebA(root: str, split: str = 'train', target_type: Union[
+    #         List[str], str] = 'attr', transform: Optional[Callable] = None, target_transform: Optional[
+    #         Callable] = None, download: bool = False)
+
     else:
         raise ValueError('Invalid train dataset {}'.format(p['train_db_name']))
     
