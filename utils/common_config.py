@@ -51,6 +51,10 @@ def get_model(p, pretrain_path=None):
         elif p['train_db_name'] == 'stl-10':
             from models.resnet_stl import resnet18
             backbone = resnet18()
+
+        elif p['train_db_name'] == 'celeb-a':
+            from models.resnet_cifar import resnet18
+            backbone = resnet18()
         
         else:
             raise NotImplementedError
@@ -141,10 +145,11 @@ def get_train_dataset(p, transform, to_augmented_dataset=False,
         subset_file = './data/imagenet_subsets/%s.txt' %(p['train_db_name'])
         dataset = ImageNetSubset(subset_file=subset_file, split='train', transform=transform)
 
-    # elif p['train_db_name'] == 'celeb-a':
-    #     torchvision.datasets.CelebA(root: str, split: str = 'train', target_type: Union[
-    #         List[str], str] = 'attr', transform: Optional[Callable] = None, target_transform: Optional[
-    #         Callable] = None, download: bool = False)
+    elif p['train_db_name'] == 'celeb-a':
+        import torchvision
+        from data.celeba import TempCelebADataset
+        dataset = torchvision.datasets.CelebA(r'E:\datasets\celeb-a', 'train')
+        dataset = TempCelebADataset(dataset, transform=transform)
 
     else:
         raise ValueError('Invalid train dataset {}'.format(p['train_db_name']))
@@ -184,7 +189,13 @@ def get_val_dataset(p, transform=None, to_neighbors_dataset=False):
         from data.imagenet import ImageNetSubset
         subset_file = './data/imagenet_subsets/%s.txt' %(p['val_db_name'])
         dataset = ImageNetSubset(subset_file=subset_file, split='val', transform=transform)
-    
+
+    elif p['val_db_name'] == 'celeb-a':
+        import torchvision
+        from data.celeba import TempCelebADataset
+        dataset = torchvision.datasets.CelebA(r'E:\datasets\celeb-a', 'valid')
+        dataset = TempCelebADataset(dataset, transform=transform)
+
     else:
         raise ValueError('Invalid validation dataset {}'.format(p['val_db_name']))
     
