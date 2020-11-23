@@ -37,7 +37,7 @@ for index, row in tqdm.tqdm(bboxes.iterrows(), desc='Cropping & downsampling Cel
     x0 = 0
     x1 = image.width
     # cropped = image.crop([x0, y0, x1, y1])
-    cropped = image.resize((64, 64), box=(x0, y0, x1, y1))
+    cropped = image.resize((image_out_size, image_out_size), box=(x0, y0, x1, y1))
 
     cropped.save(out_path, "JPEG")
     pass

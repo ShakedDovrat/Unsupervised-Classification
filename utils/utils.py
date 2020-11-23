@@ -6,6 +6,8 @@ import os
 import torch
 import numpy as np
 import errno
+import pickle
+
 
 def mkdir_if_missing(directory):
     if not os.path.exists(directory):
@@ -96,3 +98,14 @@ def confusion_matrix(predictions, gt, class_names, output_file=None):
     else:
         plt.savefig(output_file, dpi=300, bbox_inches='tight')
     plt.close()
+
+
+def dump_to_pickle(obj, path):
+    with open(path, 'wb') as f:
+        pickle.dump(obj, f)
+
+
+def load_from_pickle(path):
+    with open(path, 'rb') as f:
+        obj = pickle.load(f)
+    return obj

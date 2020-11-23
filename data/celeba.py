@@ -3,6 +3,8 @@ from torch.utils.data import Dataset
 
 class TempCelebADataset(Dataset):
     def __init__(self, dataset, transform=None):
+        # TODO: Separate train/test
+        super(TempCelebADataset, self).__init__()
         self.dataset = dataset
         self.transform = transform
 
