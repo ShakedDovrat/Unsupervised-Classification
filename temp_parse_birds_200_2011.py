@@ -56,6 +56,7 @@ for d in tqdm.tqdm(image_dirs, desc='Cropping & downsampling Birds 200-2011 imag
         id = images_pd[images_pd[1].str.contains(image_name)].to_numpy()[0]
         assert id.shape == (2,)
         klass = classes_pd[1][classes_pd[0] == id[0]].to_numpy()[0]
+        klass -= 1  # class nums should be zero-based...
         is_training_image = split_pd[1][split_pd[0] == id[0]].to_numpy()[0]
         target = np.concatenate((id, [klass, is_training_image]))
 
