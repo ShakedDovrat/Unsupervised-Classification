@@ -22,10 +22,12 @@ images_txt_path = os.path.join(birds_200_2011_root_dir, r'CUB_200_2011\images.tx
 # # attributes_txt_path = os.path.join(birds_200_2011_root_dir, r'CUB_200_2011\attributes\image_attribute_labels.txt')
 # attributes_txt_path = os.path.join(birds_200_2011_root_dir, r'CUB_200_2011\attributes\image_attribute_labels_FIXED_6_columns.txt')
 classes_txt_path = os.path.join(birds_200_2011_root_dir, r'CUB_200_2011\image_class_labels.txt')
+split_txt_path = os.path.join(birds_200_2011_root_dir, r'CUB_200_2011\train_test_split.txt')
 
 images_pd = pd.read_csv(images_txt_path, delim_whitespace=True, header=None)
 # attributes_pd = pd.read_csv(attributes_txt_path, delim_whitespace=True, header=None)
 classes_pd = pd.read_csv(classes_txt_path, delim_whitespace=True, header=None)
+split_pd = pd.read_csv(split_txt_path, delim_whitespace=True, header=None)
 
 images = []
 ids = []
@@ -54,7 +56,8 @@ for d in tqdm.tqdm(image_dirs, desc='Cropping & downsampling Birds 200-2011 imag
         id = images_pd[images_pd[1].str.contains(image_name)].to_numpy()[0]
         assert id.shape == (2,)
         klass = classes_pd[1][classes_pd[0] == id[0]].to_numpy()[0]
-        target = np.append(id, klass)
+        is_training_image = split_pd[1][split_pd[0] == id[0]].to_numpy()[0]
+        target = np.concatenate((id, [klass, is_training_image]))
 
         images.append(cropped)
         ids.append(target)

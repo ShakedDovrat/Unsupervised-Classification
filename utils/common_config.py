@@ -157,7 +157,7 @@ def get_train_dataset(p, transform, to_augmented_dataset=False,
 
     elif p['train_db_name'] == 'birds-200-2011':
         from data.birds200 import Birds200_2011
-        dataset = Birds200_2011(transform=transform)
+        dataset = Birds200_2011(is_train=True, transform=transform)
 
     else:
         raise ValueError('Invalid train dataset {}'.format(p['train_db_name']))
@@ -206,7 +206,7 @@ def get_val_dataset(p, transform=None, to_neighbors_dataset=False):
 
     elif p['val_db_name'] == 'birds-200-2011':
         from data.birds200 import Birds200_2011
-        dataset = Birds200_2011(transform=transform)
+        dataset = Birds200_2011(is_train=False, transform=transform)
 
     else:
         raise ValueError('Invalid validation dataset {}'.format(p['val_db_name']))
