@@ -28,15 +28,15 @@ optimizer_kwargs:
 scheduler: cosine
 scheduler_kwargs:
    lr_decay_rate: 0.1
-batch_size: 256 #512
-num_workers: 8
+batch_size: 192 # 256 #512
+num_workers: 2 # 8
 
 # Transformations
 augmentation_strategy: simclr 
 augmentation_kwargs:
    random_resized_crop:
-      size: 32
-      scale: [0.2, 1.0]
+      size: 48 # 32
+      scale: [0.7, 1.0] # [0.2, 1.0]
    color_jitter_random_apply:
       p: 0.8
    color_jitter:
@@ -51,7 +51,7 @@ augmentation_kwargs:
       std: [0.21338888,0.20869549,0.24722904] #  <- 32x32, 64z64 -> [0.22167043, 0.21696173, 0.25494133]
 
 transformation_kwargs:
-   crop_size: 32
+   crop_size: 48 # 32
    normalize:
       mean: [0.48551162, 0.4966364, 0.42870739] # <- 32x32, 64z64 -> [0.48547093, 0.49658954, 0.42867865]
       std: [0.21338888,0.20869549,0.24722904] #  <- 32x32, 64z64 -> [0.22167043, 0.21696173, 0.25494133]
