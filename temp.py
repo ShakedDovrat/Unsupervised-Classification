@@ -1,57 +1,47 @@
-import os
-
 import numpy as np
+import pandas as pd
+import tqdm
 
-from utils.utils import load_from_pickle, dump_to_pickle
+part_locs_path = r"E:\datasets\Caltech-UCSD-Birds-200-2011\CUB_200_2011\parts\part_locs.txt"
+part_locs_pd = pd.read_csv(part_locs_path, delim_whitespace=True, header=None)
+part_locs_pd.columns = ['image_id', 'part_id', 'x', 'y', 'visible']
 
-birds_200_2011_root_dir = r'E:\datasets\Caltech-UCSD-Birds-200-2011'
-birds_200_2011_output_dir = os.path.join(birds_200_2011_root_dir, r'CUB_200_2011\parsed')
-in_pickle_path = os.path.join(birds_200_2011_output_dir, 'data.pkl')
-out_pickle_path = os.path.join(birds_200_2011_output_dir, 'data_filtered.pkl')
-out_pickle_path2 = os.path.join(birds_200_2011_output_dir, 'data_filtered_numpy.pkl')
-out_pickle_path3 = os.path.join(birds_200_2011_output_dir, 'data_filtered_numpy_32_32_unnormed.pkl')
-out_pickle_path4_train = os.path.join(birds_200_2011_output_dir, 'data_filtered_numpy_64_64_unnormed_train.pkl')
-out_pickle_path4_val = os.path.join(birds_200_2011_output_dir, 'data_filtered_numpy_64_64_unnormed_val.pkl')
+per_image = part_locs_pd.groupby('image_id')
 
-images, targets = load_from_pickle(in_pickle_path)
+part_names = part_locs_pd['part_id'].unique()
+num_parts = len(part_names)
+image_ids = []
+are_parts_visible = []
 
-images_np = [(np.array(image), image, target) for image, target in zip(images, targets) if image.mode == 'RGB']
+for image_id, row_indices in tqdm.tqdm(per_image.groups.items(), desc='Extracting attributes'):
+    curr_pd = part_locs_pd.iloc[row_indices, :]
+    visible_part_names = curr_pd['part_id'].to_numpy()[curr_pd['visible'].to_numpy().astype(np.bool)]
+    visible_part_indices = np.isin(part_names, visible_part_names)
+    image_ids.append(image_id)
+    are_parts_visible.append(visible_part_indices)
+# for part_id in part_locs_pd['part_id'].unique():
 
-images_stack = np.stack([i[0] for i in images_np])
+image_ids = np.array(image_ids)
+are_parts_visible = np.stack(are_parts_visible)
 
-images_stack_normed = images_stack / 255
-rgb_mean = np.mean(images_stack_normed, axis=(0, 1, 2))
-rgb_std = np.std(images_stack_normed, axis=(0, 1, 2))
-print('RGB mean:', rgb_mean)
-print('RGB std:', rgb_std)
+eyes_part_names = (7, 11)
+legs_part_names = (8, 12)
+wings_part_names = (9, 13)
 
-dump_to_pickle([a[1:] for a in images_np], out_pickle_path)
+organ_names = ['eyes', 'legs', 'wings']
+organ_part_names = (eyes_part_names, legs_part_names, wings_part_names)
+result = []
+result_names = ['both', 'none', 'xor']
+for organ_name, curr_part_names in zip(organ_names, organ_part_names):
+    left_right_visible = are_parts_visible[:, np.isin(part_names, curr_part_names)]
+    both = left_right_visible.all(axis=1)
+    none = ~left_right_visible.any(axis=1)
+    xor = ~none & ~both
+    assert (both | none | xor).all()
+    assert ~(both & none & xor).any()
+    result.append((both.mean(), none.mean(), xor.mean()))
 
-targets_ = [a[2] for a in images_np]
-dump_to_pickle((images_stack_normed, targets_), out_pickle_path2)
-
-
-
-images_stack = np.stack([np.array(a[1].resize((32, 32))) for a in images_np])
-
-# images_stack_normed = images_stack / 255
-# rgb_mean = np.mean(images_stack, axis=(0, 1, 2))
-# rgb_std = np.std(images_stack, axis=(0, 1, 2))
-# print('RGB mean:', rgb_mean)
-# print('RGB std:', rgb_std)
-
-dump_to_pickle((images_stack, targets_), out_pickle_path3)
-
-
-
-images_stack = np.stack([np.array(a[1].resize((64, 64))) for a in images_np])
-
-targets__ = np.stack(targets_)
-is_training_image = targets__[:, 3].astype(np.bool)
-train_set = images_stack[is_training_image]
-val_set = images_stack[~is_training_image]
-train_targets = targets__[is_training_image]
-val_targets = targets__[~is_training_image]
-
-dump_to_pickle((train_set, train_targets), out_pickle_path4_train)
-dump_to_pickle((val_set, val_targets), out_pickle_path4_val)
+result = np.stack(result)
+result_df = pd.DataFrame(data=result, index=organ_names, columns=result_names)
+print(result_df*100)
+pass
