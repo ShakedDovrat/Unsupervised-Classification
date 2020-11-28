@@ -29,6 +29,8 @@ def create_config(config_file_env, config_file_exp):
     cfg['pretext_dir'] = pretext_dir
     cfg['pretext_checkpoint'] = os.path.join(pretext_dir, 'checkpoint.pth.tar')
     cfg['pretext_model'] = os.path.join(pretext_dir, 'model.pth.tar')
+    cfg['pretext_fine_tune_checkpoint'] = os.path.join(pretext_dir, 'fine-tune', 'checkpoint.pth.tar')
+    cfg['pretext_fine_tune_model'] = os.path.join(pretext_dir, 'fine-tune', 'model.pth.tar')
     cfg['topk_neighbors_train_path'] = os.path.join(pretext_dir, 'topk-train-neighbors.npy')
     cfg['topk_neighbors_val_path'] = os.path.join(pretext_dir, 'topk-val-neighbors.npy')
 

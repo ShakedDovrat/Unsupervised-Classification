@@ -35,6 +35,13 @@ class AugmentedDataset(Dataset):
         sample['image'] = self.image_transform(image)
         sample['image_augmented'] = self.augmentation_transform(image)
 
+        # Debug:
+        # import torchvision
+        # transforms_ = torchvision.transforms.Compose(self.image_transform.transforms[:4])
+        # aug_transforms_ = torchvision.transforms.Compose(self.augmentation_transform.transforms[:4])
+        # image_ = transforms_(image)
+        # aug_image_ = aug_transforms_(image)
+
         return sample
 
 

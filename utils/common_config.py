@@ -24,6 +24,9 @@ def get_criterion(p):
         from losses.losses import ConfidenceBasedCE
         criterion = ConfidenceBasedCE(p['confidence_threshold'], p['criterion_kwargs']['apply_class_balancing'])
 
+    elif p['criterion'] == 'attributes-fine-tune':
+        criterion = torch.nn.CrossEntropyLoss()
+
     else:
         raise ValueError('Invalid criterion {}'.format(p['criterion']))
 
@@ -157,7 +160,7 @@ def get_train_dataset(p, transform, to_augmented_dataset=False,
 
     elif p['train_db_name'] == 'birds-200-2011':
         from data.birds200 import Birds200_2011
-        dataset = Birds200_2011(is_train=True, transform=transform)
+        dataset = Birds200_2011(is_train=True, targets_type=p['db_targets'], transform=transform)
 
     else:
         raise ValueError('Invalid train dataset {}'.format(p['train_db_name']))
@@ -206,7 +209,7 @@ def get_val_dataset(p, transform=None, to_neighbors_dataset=False):
 
     elif p['val_db_name'] == 'birds-200-2011':
         from data.birds200 import Birds200_2011
-        dataset = Birds200_2011(is_train=False, transform=transform)
+        dataset = Birds200_2011(is_train=False, targets_type=p['db_targets'], transform=transform)
 
     else:
         raise ValueError('Invalid validation dataset {}'.format(p['val_db_name']))

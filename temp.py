@@ -38,7 +38,7 @@ for organ_name, curr_part_names in zip(organ_names, organ_part_names):
     none = ~left_right_visible.any(axis=1)
     xor = ~none & ~both
     assert (both | none | xor).all()
-    assert ~(both & none & xor).any()
+    assert ~((both & none & xor).any())
     result.append((both.mean(), none.mean(), xor.mean()))
 
 result = np.stack(result)

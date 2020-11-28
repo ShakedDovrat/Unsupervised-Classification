@@ -11,10 +11,11 @@ model_kwargs:
 train_db_name: birds-200-2011
 val_db_name: birds-200-2011
 num_classes: 200
-db_targets: class
+db_targets: attributes
+num_attribute_classes: 10
 
 # Loss
-criterion: simclr
+criterion: attributes-fine-tune
 criterion_kwargs:
    temperature: 0.1 
 

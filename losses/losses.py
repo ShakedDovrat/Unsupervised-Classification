@@ -127,7 +127,6 @@ class SimCLRLoss(nn.Module):
         super(SimCLRLoss, self).__init__()
         self.temperature = temperature
 
-    
     def forward(self, features):
         """
         input:

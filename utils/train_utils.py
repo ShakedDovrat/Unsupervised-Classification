@@ -126,3 +126,36 @@ def selflabel_train(train_loader, model, criterion, optimizer, epoch, ema=None):
         
         if i % 25 == 0:
             progress.display(i)
+
+
+def simclr_fine_tune_train(train_loader, model, criterion, optimizer, epoch):
+    losses = AverageMeter('Loss', ':.4e')
+    acc = AverageMeter('Acc@1', ':6.2f')
+    progress = ProgressMeter(len(train_loader),
+        [losses, acc],
+        prefix="Epoch: [{}]".format(epoch))
+
+    model.train()
+
+    for i, batch in enumerate(train_loader):
+        images = batch['image']
+        # images_augmented = batch['image_augmented']
+        # b, c, h, w = images.size()
+        # input_ = torch.cat([images.unsqueeze(1), images_augmented.unsqueeze(1)], dim=1)
+        # input_ = input_.view(-1, c, h, w)
+        # input_ = input_.cuda(non_blocking=True)
+        input_ = images.cuda(non_blocking=True)
+        targets = torch.from_numpy(batch['target']).cuda(non_blocking=True)
+
+        output = model(input_)
+        loss = criterion(output, targets)
+        losses.update(loss.item())
+        acc1 = 100 * torch.mean(torch.eq(torch.argmax(output, dim=1), targets).float())
+        acc.update(acc1)
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        if i % 25 == 0:
+            progress.display(i)
