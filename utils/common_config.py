@@ -293,8 +293,8 @@ def get_optimizer(p, model, cluster_head_only=False):
         assert(len(params) == 2 * p['num_heads'])
 
     else:
-        params = model.parameters()
-                
+        # params = model.parameters()
+        params = list(filter(lambda p: p.requires_grad, model.parameters()))
 
     if p['optimizer'] == 'sgd':
         optimizer = torch.optim.SGD(params, **p['optimizer_kwargs'])

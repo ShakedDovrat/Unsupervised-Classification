@@ -82,18 +82,13 @@ def main(args):
     print('Criterion is {}'.format(criterion.__class__.__name__))
     criterion = criterion.cuda()
 
-    # Optimizer and scheduler
-    print(colored('Retrieve optimizer', 'blue'))
-    optimizer = get_optimizer(p, model)
-    print(optimizer)
-
     # Checkpoint
     # p['pretext_checkpoint'] = p['pretext_checkpoint'].replace('checkpoint.pth.tar', '2nd_94306c9_checkpoint.pth.tar')  # Specific model
 
     assert os.path.exists(p['pretext_checkpoint']), "Checkpoint not found - can't fine-tune."
     print(colored('Restart from checkpoint {}'.format(p['pretext_checkpoint']), 'blue'))
     checkpoint = torch.load(p['pretext_checkpoint'], map_location='cpu')
-    optimizer.load_state_dict(checkpoint['optimizer'])
+    # optimizer.load_state_dict(checkpoint['optimizer'])
     model.load_state_dict(checkpoint['model'])
     model.cuda()
     # start_epoch = checkpoint['epoch']
@@ -104,8 +99,14 @@ def main(args):
 
     for parameter in model.parameters():
         parameter.requires_grad = False
-    model = nn.Sequential(model, AttributesHead(p['model_kwargs']['features_dim'], p['num_attribute_classes']))
+    # model = nn.Sequential(model, AttributesHead(p['model_kwargs']['features_dim'], p['num_attribute_classes']))
+    model = nn.Sequential(model, nn.Linear(p['model_kwargs']['features_dim'], p['num_attribute_classes']))
     model.cuda()
+
+    # Optimizer and scheduler
+    print(colored('Retrieve optimizer', 'blue'))
+    optimizer = get_optimizer(p, model)
+    print(optimizer)
 
     # Training
     print(colored('Starting main loop', 'blue'))
