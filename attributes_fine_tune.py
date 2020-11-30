@@ -3,6 +3,7 @@ import os
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from termcolor import colored
 
 from utils.config import create_config
@@ -12,16 +13,17 @@ from utils.common_config import get_criterion, get_model, get_train_dataset,\
                                 get_val_transformations, get_optimizer,\
                                 adjust_learning_rate
 from utils.train_utils import simclr_fine_tune_train
-from utils.utils import AverageMeter, confusion_matrix
+from utils.utils import AverageMeter, confusion_matrix, np_to_tensor_safe
 
 
 class AttributesHead(nn.Module):
     def __init__(self, features_dim, num_classes):
         super(AttributesHead, self).__init__()
-        self.fc = nn.Linear(features_dim, num_classes)
+        self.fc = nn.Linear(features_dim, 256)
+        self.fc2 = nn.Linear(256, num_classes)
 
     def forward(self, x):
-        return self.fc(x)
+        return self.fc2(F.leaky_relu(self.fc(x), inplace=True))
 
 
 @torch.no_grad()
@@ -31,7 +33,7 @@ def attributes_evaluate(val_loader, model):
 
     for batch in val_loader:
         images = batch['image'].cuda(non_blocking=True)
-        target = torch.from_numpy(batch['target']).cuda(non_blocking=True)#batch['target'].cuda(non_blocking=True)
+        target = np_to_tensor_safe(batch['target']).cuda(non_blocking=True)#batch['target'].cuda(non_blocking=True)
 
         output = model(images)
         # output = memory_bank.weighted_knn(output)#.cpu())
@@ -86,6 +88,8 @@ def main(args):
     print(optimizer)
 
     # Checkpoint
+    # p['pretext_checkpoint'] = p['pretext_checkpoint'].replace('checkpoint.pth.tar', '2nd_94306c9_checkpoint.pth.tar')  # Specific model
+
     assert os.path.exists(p['pretext_checkpoint']), "Checkpoint not found - can't fine-tune."
     print(colored('Restart from checkpoint {}'.format(p['pretext_checkpoint']), 'blue'))
     checkpoint = torch.load(p['pretext_checkpoint'], map_location='cpu')

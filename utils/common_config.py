@@ -156,7 +156,7 @@ def get_train_dataset(p, transform, to_augmented_dataset=False,
         import torchvision
         from data.celeba import TempCelebADataset
         # dataset = torchvision.datasets.CelebA(r'E:\datasets\celeb-a', 'train')
-        dataset = TempCelebADataset('train', transform=transform)
+        dataset = TempCelebADataset('train', target_type=p['db_targets'], attr_index=p['attr_index'], transform=transform)
 
     elif p['train_db_name'] == 'birds-200-2011':
         from data.birds200 import Birds200_2011
@@ -205,7 +205,7 @@ def get_val_dataset(p, transform=None, to_neighbors_dataset=False):
         import torchvision
         from data.celeba import TempCelebADataset
         # dataset = torchvision.datasets.CelebA(r'E:\datasets\celeb-a', 'valid')
-        dataset = TempCelebADataset('valid', transform=transform)
+        dataset = TempCelebADataset('valid', target_type=p['db_targets'], attr_index=p['attr_index'], transform=transform)
 
     elif p['val_db_name'] == 'birds-200-2011':
         from data.birds200 import Birds200_2011

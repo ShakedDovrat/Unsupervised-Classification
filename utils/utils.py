@@ -109,3 +109,7 @@ def load_from_pickle(path):
     with open(path, 'rb') as f:
         obj = pickle.load(f)
     return obj
+
+
+def np_to_tensor_safe(a):  # TODO: Understand why I get numpy with Birds fine-tune and tensor with CelebA fine-tune, then delete this.
+    return a if isinstance(a, torch.Tensor) else  torch.from_numpy(a)

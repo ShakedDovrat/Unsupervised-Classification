@@ -4,7 +4,7 @@ Licensed under the CC BY-NC 4.0 license (https://creativecommons.org/licenses/by
 """
 import torch
 import numpy as np
-from utils.utils import AverageMeter, ProgressMeter
+from utils.utils import AverageMeter, ProgressMeter, np_to_tensor_safe
 
 
 def simclr_train(train_loader, model, criterion, optimizer, epoch):
@@ -145,7 +145,7 @@ def simclr_fine_tune_train(train_loader, model, criterion, optimizer, epoch):
         # input_ = input_.view(-1, c, h, w)
         # input_ = input_.cuda(non_blocking=True)
         input_ = images.cuda(non_blocking=True)
-        targets = torch.from_numpy(batch['target']).cuda(non_blocking=True)
+        targets = np_to_tensor_safe(batch['target']).cuda(non_blocking=True)
 
         output = model(input_)
         loss = criterion(output, targets)

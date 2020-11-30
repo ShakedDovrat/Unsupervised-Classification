@@ -11,6 +11,8 @@ model_kwargs:
 train_db_name: celeb-a
 val_db_name: celeb-a
 num_classes: 10177
+db_targets: identity
+attr_index: -1
 
 # Loss
 criterion: simclr

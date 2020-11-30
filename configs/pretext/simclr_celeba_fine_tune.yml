@@ -8,11 +8,12 @@ model_kwargs:
    features_dim: 128
 
 # Dataset
-train_db_name: birds-200-2011
-val_db_name: birds-200-2011
-num_classes: 200
-db_targets: attributes
-num_attribute_classes: 10
+train_db_name: celeb-a
+val_db_name: celeb-a
+num_classes: 10177
+db_targets: attr
+attr_index: 20
+num_attribute_classes: 2  # e.g. Male/Female
 
 # Loss
 criterion: attributes-fine-tune
@@ -49,11 +50,11 @@ augmentation_kwargs:
    random_grayscale: 
       p: 0.2
    normalize:
-      mean: [0.48551162, 0.4966364, 0.42870739] # <- 32x32, 64z64 -> [0.48547093, 0.49658954, 0.42867865]
-      std: [0.21338888,0.20869549,0.24722904] #  <- 32x32, 64z64 -> [0.22167043, 0.21696173, 0.25494133]
+      mean: [0.50773493, 0.42190761, 0.37649541]
+      std: [0.30310455, 0.28182062, 0.28093909]
 
 transformation_kwargs:
    crop_size: 48 # 32
    normalize:
-      mean: [0.48551162, 0.4966364, 0.42870739] # <- 32x32, 64z64 -> [0.48547093, 0.49658954, 0.42867865]
-      std: [0.21338888,0.20869549,0.24722904] #  <- 32x32, 64z64 -> [0.22167043, 0.21696173, 0.25494133]
+      mean: [0.50773493, 0.42190761, 0.37649541]
+      std: [0.30310455, 0.28182062, 0.28093909]

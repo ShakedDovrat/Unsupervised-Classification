@@ -11,7 +11,7 @@ from utils.utils import load_from_pickle
 class TempCelebADataset(Dataset):
     dataset_dir = r'E:\datasets\celeb-a\parsed_img_align_celeba'
 
-    def __init__(self, split, target_type='identity', data_dir=dataset_dir, transform=None):
+    def __init__(self, split, target_type='identity', attr_index=None, data_dir=dataset_dir, transform=None):
         super(TempCelebADataset, self).__init__()
 
         # self.images, identities, attributes = load_from_pickle(os.path.join(data_dir, f'{split}.pkl'))
@@ -22,8 +22,15 @@ class TempCelebADataset(Dataset):
         self.images, identities, attributes = (np.concatenate(d, axis=0) for d in zip(*data))
         self.images = self.images.transpose((0, 2, 3, 1))
 
-        assert target_type in ['identity', 'attr'], 'Expected argument `target_type` to be "identity" or "attr".'
-        self.targets = identities - 1 if target_type == 'identity' else attributes
+        # assert target_type in ['identity', 'attr'], 'Expected argument `target_type` to be "identity" or "attr".'
+        # self.targets = identities - 1 if target_type == 'identity' else attributes
+        if target_type == 'identity':
+            self.targets = identities - 1
+        elif target_type == 'attr':
+            assert attr_index is not None, 'Need to provide `attr_index` argument when `target_type`=="identity"'
+            self.targets = attributes[:, attr_index]
+        else:
+            raise ValueError('Expected argument `target_type` to be "identity" or "attr".')
         self.transform = transform
 
     def __getitem__(self, index):
