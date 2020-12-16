@@ -67,6 +67,8 @@ def fill_memory_bank(loader, model, memory_bank):
         images = batch['image'].cuda(non_blocking=True)
         targets = batch['target'].cuda(non_blocking=True)
         output = model(images)
+        if isinstance(output, tuple):
+            output = output[0]
         memory_bank.update(output, targets)
         if i % 100 == 0:
             print('Fill Memory Bank [%d/%d]' %(i, len(loader)))
@@ -112,4 +114,4 @@ def load_from_pickle(path):
 
 
 def np_to_tensor_safe(a):  # TODO: Understand why I get numpy with Birds fine-tune and tensor with CelebA fine-tune, then delete this.
-    return a if isinstance(a, torch.Tensor) else  torch.from_numpy(a)
+    return a if isinstance(a, torch.Tensor) else torch.from_numpy(a)

@@ -162,3 +162,13 @@ class SimCLRLoss(nn.Module):
         loss = - ((mask * log_prob).sum(1) / mask.sum(1)).mean()
 
         return loss
+
+
+class ScaledL1Loss(nn.Module):
+    def __init__(self, scale):
+        super(ScaledL1Loss, self).__init__()
+        self.scale = scale
+        self.l1Loss = nn.L1Loss()
+
+    def forward(self, input, target):
+        return self.scale * self.l1Loss(input, target)

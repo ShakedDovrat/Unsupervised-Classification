@@ -7,15 +7,21 @@ import numpy as np
 from utils.utils import AverageMeter, ProgressMeter, np_to_tensor_safe
 
 
-def simclr_train(train_loader, model, criterion, optimizer, epoch):
+def simclr_train(train_loader, model, criterion, optimizer, epoch, augs_criterion=None):
     """ 
     Train according to the scheme from SimCLR
     https://arxiv.org/abs/2002.05709
     """
     losses = AverageMeter('Loss', ':.4e')
-    progress = ProgressMeter(len(train_loader),
-        [losses],
-        prefix="Epoch: [{}]".format(epoch))
+    if augs_criterion is None:
+        progress = ProgressMeter(len(train_loader),
+                                 [losses],
+                                 prefix="Epoch: [{}]".format(epoch))
+    else:
+        augs_losses = AverageMeter('Augs Loss', ':.4e')
+        progress = ProgressMeter(len(train_loader),
+                                 [losses, augs_losses],
+                                 prefix="Epoch: [{}]".format(epoch))
 
     model.train()
 
@@ -28,9 +34,27 @@ def simclr_train(train_loader, model, criterion, optimizer, epoch):
         input_ = input_.cuda(non_blocking=True)
         targets = batch['target'].cuda(non_blocking=True)
 
-        output = model(input_).view(b, 2, -1)
-        loss = criterion(output)
-        losses.update(loss.item())
+        # aug_targets1 = torch.cat([a.unsqueeze(1) for a in batch['image_aug_labels'][4:7]], dim=1)
+        # aug_targets2 = torch.cat([a.unsqueeze(1) for a in batch['image_augmented_aug_labels'][4:7]], dim=1)
+        # aug_targets = torch.cat([aug_targets1, aug_targets2])
+        # aug_targets = aug_targets.cuda(non_blocking=True)
+
+        if augs_criterion is None:
+            output = model(input_).view(b, 2, -1)
+            loss = criterion(output)
+            losses.update(loss.item())
+        else:
+            aug_targets = torch.cat([a.unsqueeze(1) for a in batch['aug_labels']], dim=1)
+            # aug_targets = torch.cat([aug_targets, aug_targets])
+            aug_targets = aug_targets.cuda(non_blocking=True)
+
+            output, augs_output = model(input_)
+            output = output.view(b, 2, -1)
+            loss = criterion(output)
+            losses.update(loss.item())
+            augs_loss = augs_criterion(augs_output, aug_targets)
+            augs_losses.update(augs_loss.item())
+            loss = sum([loss, augs_loss])
 
         optimizer.zero_grad()
         loss.backward()

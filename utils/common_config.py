@@ -7,6 +7,7 @@ import math
 import numpy as np
 import torch
 import torchvision.transforms as transforms
+import transformations as shaked_transforms
 from data.augment import Augment, Cutout
 from utils.collate import collate_custom
 
@@ -80,7 +81,11 @@ def get_model(p, pretrain_path=None):
     # Setup
     if p['setup'] in ['simclr', 'moco']:
         from models.models import ContrastiveModel
-        model = ContrastiveModel(backbone, **p['model_kwargs'])
+        add_augs_loss = p.get('add_augs_loss', False)
+        if add_augs_loss:
+            model = ContrastiveModel(backbone, **p['model_kwargs'], add_augs_loss=add_augs_loss, augs_loss_dim=p['augs_loss_params']['dim'])
+        else:
+            model = ContrastiveModel(backbone, **p['model_kwargs'])
 
     elif p['setup'] in ['scan', 'selflabel']:
         from models.models import ClusteringModel
@@ -247,13 +252,13 @@ def get_train_transformations(p):
     
     elif p['augmentation_strategy'] == 'simclr':
         # Augmentation strategy from the SimCLR paper
-        return transforms.Compose([
-            transforms.RandomResizedCrop(**p['augmentation_kwargs']['random_resized_crop']),
-            transforms.RandomHorizontalFlip(),
-            transforms.RandomApply([
+        return shaked_transforms.Compose([
+            shaked_transforms.RandomResizedCrop(**p['augmentation_kwargs']['random_resized_crop']),  # IOU
+            shaked_transforms.RandomHorizontalFlip(),  # XOR
+            shaked_transforms.RandomApply([  # OR
                 transforms.ColorJitter(**p['augmentation_kwargs']['color_jitter'])
             ], p=p['augmentation_kwargs']['color_jitter_random_apply']['p']),
-            transforms.RandomGrayscale(**p['augmentation_kwargs']['random_grayscale']),
+            shaked_transforms.RandomGrayscale(**p['augmentation_kwargs']['random_grayscale']),  # OR
             transforms.ToTensor(),
             transforms.Normalize(**p['augmentation_kwargs']['normalize'])
         ])

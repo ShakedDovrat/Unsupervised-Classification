@@ -31,9 +31,32 @@ class AugmentedDataset(Dataset):
     def __getitem__(self, index):
         sample = self.dataset.__getitem__(index)
         image = sample['image']
-        
-        sample['image'] = self.image_transform(image)
-        sample['image_augmented'] = self.augmentation_transform(image)
+
+        # img = self.image_transform(image)
+        # if isinstance(img, tuple):
+        #     sample['image'], sample['image_aug_labels'] = img
+        # else:
+        #     sample['image'] = img
+        #
+        # img = self.augmentation_transform(image)
+        # if isinstance(img, tuple):
+        #     sample['image_augmented'], sample['image_augmented_aug_labels'] = img
+        # else:
+        #     sample['image_augmented'] = img
+
+        img = self.image_transform(image)
+        if isinstance(img, tuple):
+            sample['image'], aug_params1 = img
+            sample['image_augmented'], aug_params2 = self.augmentation_transform(image)
+
+            sample['aug_labels'] = [
+                aug_params1[4] != aug_params2[4],  # horizontal flip - XOR
+                aug_params1[5] or aug_params2[5],  # color jitter
+                aug_params1[6] or aug_params2[6]  # grayscale
+            ]
+        else:
+            sample['image'] = img
+            sample['image_augmented'] = self.augmentation_transform(image)
 
         # Debug:
         # import torchvision

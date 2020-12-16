@@ -17,7 +17,7 @@ attr_index: -1
 # Loss
 criterion: simclr
 criterion_kwargs:
-   temperature: 0.1 
+   temperature: 0.1
 
 # Hyperparameters
 epochs: 500
@@ -57,3 +57,10 @@ transformation_kwargs:
    normalize:
       mean: [0.50773493, 0.42190761, 0.37649541]
       std: [0.30310455, 0.28182062, 0.28093909]
+
+# augs aux loss
+add_augs_loss: True
+augs_loss_params:
+   criterion: L1Loss
+   scale: 5.0
+   dim: 3

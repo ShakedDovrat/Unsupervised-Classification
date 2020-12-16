@@ -76,6 +76,12 @@ def main():
     criterion = get_criterion(p)
     print('Criterion is {}'.format(criterion.__class__.__name__))
     criterion = criterion.cuda()
+    if p.get('add_augs_loss', False):
+        from losses.losses import ScaledL1Loss
+        augs_criterion = ScaledL1Loss(p['augs_loss_params']['scale'])
+        augs_criterion.cuda()
+    else:
+        augs_criterion = None
 
     # Optimizer and scheduler
     print(colored('Retrieve optimizer', 'blue'))
@@ -108,7 +114,7 @@ def main():
         
         # Train
         print('Train ...')
-        simclr_train(train_dataloader, model, criterion, optimizer, epoch)
+        simclr_train(train_dataloader, model, criterion, optimizer, epoch, augs_criterion)
 
         # Fill memory bank
         print('Fill memory bank for kNN...')

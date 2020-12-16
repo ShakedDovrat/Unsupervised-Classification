@@ -36,7 +36,10 @@ def collate_custom(batch):
     elif isinstance(batch[0], collections.Sequence):
         transposed = zip(*batch)
         return [collate_custom(samples) for samples in transposed]
-    
+
+    # elif batch[0] is None:
+    #     return np.nan
+
     # elif isinstance(batch[0], PIL.JpegImagePlugin.JpegImageFile):
     #     return torch.FloatTensor(np.stack([np.array(img) for img in batch]))
     
