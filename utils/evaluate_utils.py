@@ -23,10 +23,10 @@ def contrastive_evaluate(val_loader, model, memory_bank):
         target = batch['target'].cuda(non_blocking=True)
 
         output = model(images)
-        if isinstance(output, tuple):
-            augs_output = output[1]
-
-            output = output[0]
+        # if isinstance(output, tuple):
+        #     augs_output = output[1]
+        #
+        #     output = output[0]
         output = memory_bank.weighted_knn(output) 
 
         acc1 = 100*torch.mean(torch.eq(output, target).float())

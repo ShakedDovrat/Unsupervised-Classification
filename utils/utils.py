@@ -67,8 +67,8 @@ def fill_memory_bank(loader, model, memory_bank):
         images = batch['image'].cuda(non_blocking=True)
         targets = batch['target'].cuda(non_blocking=True)
         output = model(images)
-        if isinstance(output, tuple):
-            output = output[0]
+        # if isinstance(output, tuple):
+        #     output = output[0]
         memory_bank.update(output, targets)
         if i % 100 == 0:
             print('Fill Memory Bank [%d/%d]' %(i, len(loader)))

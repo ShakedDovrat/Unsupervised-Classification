@@ -34,7 +34,7 @@ class ContrastiveModel(nn.Module):
         b = self.backbone(x)
         features = self.contrastive_head(b)
         features = F.normalize(features, dim=1)
-        if self.add_augs_loss:
+        if self.add_augs_loss and self.training:
             # feature_pairs = b.view(2, b.size(0) // 2, -1)
             feature_pairs = b.view(2, b.size(0) // 2, -1).permute((1,0,2)).reshape(-1, self.backbone_dim * 2)  # TODO: Simplify
             augs_features = self.augs_head(feature_pairs)
