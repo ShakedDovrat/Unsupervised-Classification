@@ -168,7 +168,17 @@ class ScaledL1Loss(nn.Module):
     def __init__(self, scale):
         super(ScaledL1Loss, self).__init__()
         self.scale = scale
-        self.l1Loss = nn.L1Loss()
+        self.loss = nn.L1Loss()
 
     def forward(self, input, target):
-        return self.scale * self.l1Loss(input, target)
+        return self.scale * self.loss(input, target)
+
+
+class ScaledMSELoss(nn.Module):
+    def __init__(self, scale):
+        super(ScaledMSELoss, self).__init__()
+        self.scale = scale
+        self.loss = nn.MSELoss()
+
+    def forward(self, input, target):
+        return self.scale * self.loss(input, target)

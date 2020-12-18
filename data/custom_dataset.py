@@ -50,9 +50,9 @@ class AugmentedDataset(Dataset):
             sample['image_augmented'], aug_params2 = self.augmentation_transform(image)
 
             sample['aug_labels'] = [
-                aug_params1[4] != aug_params2[4],  # horizontal flip - XOR
-                aug_params1[5] or aug_params2[5],  # color jitter
-                aug_params1[6] or aug_params2[6]  # grayscale
+                float(aug_params1[4] != aug_params2[4]),  # horizontal flip
+                float(aug_params1[5] or aug_params2[5]),  # color jitter
+                float(aug_params1[6] or aug_params2[6])  # grayscale
             ]
         else:
             sample['image'] = img

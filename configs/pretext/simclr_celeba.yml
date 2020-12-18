@@ -61,6 +61,6 @@ transformation_kwargs:
 # augs aux loss
 add_augs_loss: True
 augs_loss_params:
-   criterion: L1Loss
+   criterion: MSELoss #L1Loss
    scale: 5.0
    dim: 3

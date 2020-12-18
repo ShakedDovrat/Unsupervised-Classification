@@ -29,6 +29,7 @@ class ContrastiveModel(nn.Module):
         if self.add_augs_loss:
             self.augs_head = nn.Sequential(nn.Linear(self.backbone_dim * 2, augs_loss_dim),
                                            nn.Sigmoid())
+            # self.augs_head = nn.Linear(self.backbone_dim * 2, augs_loss_dim)
 
     def forward(self, x):
         b = self.backbone(x)
