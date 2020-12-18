@@ -8,11 +8,11 @@ import PIL
 from utils.utils import load_from_pickle
 
 
-class TempCelebADataset(Dataset):
+class CelebADataset(Dataset):
     dataset_dir = r'E:\datasets\celeb-a\parsed_img_align_celeba'
 
     def __init__(self, split, target_type='identity', attr_index=None, data_dir=dataset_dir, transform=None):
-        super(TempCelebADataset, self).__init__()
+        super(CelebADataset, self).__init__()
 
         # self.images, identities, attributes = load_from_pickle(os.path.join(data_dir, f'{split}.pkl'))
         # files = os.listdir(os.path.join(data_dir, f'{split}_part*.pkl'))

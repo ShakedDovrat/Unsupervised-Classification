@@ -8,7 +8,7 @@ import torch.nn.functional as F
 
 
 class ContrastiveModel(nn.Module):
-    def __init__(self, backbone, add_augs_loss, augs_loss_dim, head='mlp', features_dim=128):
+    def __init__(self, backbone, add_augs_loss, augs_loss_dim=None, head='mlp', features_dim=128):
         super(ContrastiveModel, self).__init__()
         self.backbone = backbone['backbone']
         self.backbone_dim = backbone['dim']

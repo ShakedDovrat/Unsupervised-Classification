@@ -83,9 +83,9 @@ def get_model(p, pretrain_path=None):
         from models.models import ContrastiveModel
         add_augs_loss = p.get('add_augs_loss', False)
         if add_augs_loss:
-            model = ContrastiveModel(backbone, **p['model_kwargs'], add_augs_loss=add_augs_loss, augs_loss_dim=p['augs_loss_params']['dim'])
+            model = ContrastiveModel(backbone, **p['model_kwargs'], add_augs_loss=True, augs_loss_dim=p['augs_loss_params']['dim'])
         else:
-            model = ContrastiveModel(backbone, **p['model_kwargs'])
+            model = ContrastiveModel(backbone, **p['model_kwargs'], add_augs_loss=False)
 
     elif p['setup'] in ['scan', 'selflabel']:
         from models.models import ClusteringModel
@@ -159,9 +159,9 @@ def get_train_dataset(p, transform, to_augmented_dataset=False,
 
     elif p['train_db_name'] == 'celeb-a':
         import torchvision
-        from data.celeba import TempCelebADataset
+        from data.celeba import CelebADataset
         # dataset = torchvision.datasets.CelebA(r'E:\datasets\celeb-a', 'train')
-        dataset = TempCelebADataset('train', target_type=p['db_targets'], attr_index=p['attr_index'], transform=transform)
+        dataset = CelebADataset('train', target_type=p['db_targets'], attr_index=p['attr_index'], transform=transform)
 
     elif p['train_db_name'] == 'birds-200-2011':
         from data.birds200 import Birds200_2011
@@ -208,9 +208,9 @@ def get_val_dataset(p, transform=None, to_neighbors_dataset=False):
 
     elif p['val_db_name'] == 'celeb-a':
         import torchvision
-        from data.celeba import TempCelebADataset
+        from data.celeba import CelebADataset
         # dataset = torchvision.datasets.CelebA(r'E:\datasets\celeb-a', 'valid')
-        dataset = TempCelebADataset('valid', target_type=p['db_targets'], attr_index=p['attr_index'], transform=transform)
+        dataset = CelebADataset('valid', target_type=p['db_targets'], attr_index=p['attr_index'], transform=transform)
 
     elif p['val_db_name'] == 'birds-200-2011':
         from data.birds200 import Birds200_2011

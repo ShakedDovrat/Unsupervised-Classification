@@ -4,13 +4,16 @@ Licensed under the CC BY-NC 4.0 license (https://creativecommons.org/licenses/by
 """
 import os
 import yaml
+import socket
 from easydict import EasyDict
 from utils.utils import mkdir_if_missing
 
+
 def create_config(config_file_env, config_file_exp):
     # Config for environment path
+    computer_name = socket.gethostname()
     with open(config_file_env, 'r') as stream:
-        root_dir = yaml.safe_load(stream)['root_dir']
+        root_dir = yaml.safe_load(stream)[computer_name]['root_dir']
    
     with open(config_file_exp, 'r') as stream:
         config = yaml.safe_load(stream)

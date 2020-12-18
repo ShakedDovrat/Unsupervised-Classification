@@ -36,6 +36,8 @@ def attributes_evaluate(val_loader, model):
         target = np_to_tensor_safe(batch['target']).cuda(non_blocking=True)#batch['target'].cuda(non_blocking=True)
 
         output = model(images)
+        if isinstance(output, tuple):
+            output = output[0]
         # output = memory_bank.weighted_knn(output)#.cpu())
 
         acc1 = 100*torch.mean(torch.eq(torch.argmax(output, dim=1), target).float())
@@ -100,7 +102,7 @@ def main(args):
     for parameter in model.parameters():
         parameter.requires_grad = False
     # model = nn.Sequential(model, AttributesHead(p['model_kwargs']['features_dim'], p['num_attribute_classes']))
-    model = nn.Sequential(model, nn.Linear(p['model_kwargs']['features_dim'], p['num_attribute_classes']))
+    model.contrastive_head = nn.Sequential(model.contrastive_head, nn.Linear(p['model_kwargs']['features_dim'], p['num_attribute_classes']))
     model.cuda()
 
     # Optimizer and scheduler

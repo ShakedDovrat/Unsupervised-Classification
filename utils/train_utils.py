@@ -172,6 +172,8 @@ def simclr_fine_tune_train(train_loader, model, criterion, optimizer, epoch):
         targets = np_to_tensor_safe(batch['target']).cuda(non_blocking=True)
 
         output = model(input_)
+        if isinstance(output, tuple):
+            output = output[0]
         loss = criterion(output, targets)
         losses.update(loss.item())
         acc1 = 100 * torch.mean(torch.eq(torch.argmax(output, dim=1), targets).float())
