@@ -123,12 +123,12 @@ def main():
         print('Train ...')
         simclr_train(train_dataloader, model, criterion, optimizer, epoch, augs_criterion)
 
-        # Fill memory bank
-        print('Fill memory bank for kNN...')
-        fill_memory_bank(base_dataloader, model, memory_bank_base)
-
-        # Evaluate (To monitor progress - Not for validation)
         if epoch % num_epochs_per_eval == 0:
+            # Fill memory bank
+            print('Fill memory bank for kNN...')
+            fill_memory_bank(base_dataloader, model, memory_bank_base)
+
+            # Evaluate (To monitor progress - Not for validation)
             print('Evaluate ...')
             top1 = contrastive_evaluate(val_dataloader, model, memory_bank_base)
             print('Result of kNN evaluation is %.2f' %(top1))

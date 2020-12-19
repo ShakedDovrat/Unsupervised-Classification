@@ -49,7 +49,14 @@ class AugmentedDataset(Dataset):
             sample['image'], aug_params1 = img
             sample['image_augmented'], aug_params2 = self.augmentation_transform(image)
 
+            # img_size = img[0].size(1)
+            # assert img_size == img[0].size(2), f'Expected square image, got ({img_size},{img[0].size(2)})'
+            box1 = aug_params1[:4]
+            box2 = aug_params2[:4]
+            iou = calc_iou(box1, box2)
+
             sample['aug_labels'] = [
+                iou,  # crop (and resize)
                 float(aug_params1[4] != aug_params2[4]),  # horizontal flip
                 float(aug_params1[5] or aug_params2[5]),  # color jitter
                 float(aug_params1[6] or aug_params2[6])  # grayscale
@@ -110,3 +117,14 @@ class NeighborsDataset(Dataset):
         output['target'] = anchor['target']
         
         return output
+
+
+def calc_iou(box1, box2):
+    intersection = (min(box1[0] + box1[2], box2[0] + box2[2]) - max(box1[0], box2[0])) * \
+                   (min(box1[1] + box1[3], box2[1] + box2[3]) - max(box1[1], box2[1]))
+    if intersection <= 0:
+        return 0.0
+    union = box1[2] * box1[3] + box2[2] * box2[3] - intersection
+    iou = intersection / union
+    assert 0.0 <= iou <= 1.0
+    return iou
