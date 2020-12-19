@@ -28,7 +28,7 @@ optimizer_kwargs:
 scheduler: cosine
 scheduler_kwargs:
    lr_decay_rate: 0.1
-batch_size: 256 #512
+batch_size: 384 #256 #512
 num_workers: 8
 
 # Transformations
@@ -55,3 +55,13 @@ transformation_kwargs:
    normalize:
       mean: [0.4914, 0.4822, 0.4465]
       std: [0.2023, 0.1994, 0.2010]
+
+# augs aux loss
+add_augs_loss: True
+augs_loss_params:
+   criterion: MSELoss #L1Loss
+   scale: 3.0
+   dim: 3
+
+# Training
+num_epochs_per_eval: 4

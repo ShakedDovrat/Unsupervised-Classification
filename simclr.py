@@ -99,14 +99,16 @@ def main():
         checkpoint = torch.load(p['pretext_checkpoint'], map_location='cpu')
         optimizer.load_state_dict(checkpoint['optimizer'])
         model.load_state_dict(checkpoint['model'])
-        model.cuda()
+        model = model.cuda()
         start_epoch = checkpoint['epoch']
 
     else:
         print(colored('No checkpoint file at {}'.format(p['pretext_checkpoint']), 'blue'))
         start_epoch = 0
         model = model.cuda()
-    
+
+    num_epochs_per_eval = p.get('num_epochs_per_eval', 1)
+
     # Training
     print(colored('Starting main loop', 'blue'))
     for epoch in range(start_epoch, p['epochs']):
@@ -126,9 +128,10 @@ def main():
         fill_memory_bank(base_dataloader, model, memory_bank_base)
 
         # Evaluate (To monitor progress - Not for validation)
-        print('Evaluate ...')
-        top1 = contrastive_evaluate(val_dataloader, model, memory_bank_base)
-        print('Result of kNN evaluation is %.2f' %(top1)) 
+        if epoch % num_epochs_per_eval == 0:
+            print('Evaluate ...')
+            top1 = contrastive_evaluate(val_dataloader, model, memory_bank_base)
+            print('Result of kNN evaluation is %.2f' %(top1))
         
         # Checkpoint
         print('Checkpoint ...')

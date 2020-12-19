@@ -15,7 +15,7 @@ from losses.losses import entropy
 
 @torch.no_grad()
 def contrastive_evaluate(val_loader, model, memory_bank):
-    top1 = AverageMeter('Acc@1', ':6.2f')
+    top1 = AverageMeter('Acc@1', ':6.5f')
     model.eval()
 
     for batch in val_loader:
