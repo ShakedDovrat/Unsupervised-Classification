@@ -58,9 +58,25 @@ class AugmentedDataset(Dataset):
             sample['aug_labels'] = [
                 iou,  # crop (and resize)
                 float(aug_params1[4] != aug_params2[4]),  # horizontal flip
-                float(aug_params1[5] or aug_params2[5]),  # color jitter
-                float(aug_params1[6] or aug_params2[6])  # grayscale
+                # (brightness_factor, contrast_factor, saturation_factor, hue_factor)
+                # (max(aug_params1[5], aug_params2[5]) / min(aug_params1[5], aug_params2[5]) - 1) * 50,  # brightness_factor
+                # (max(aug_params1[6], aug_params2[6]) / min(aug_params1[6], aug_params2[6]) - 1) * 50,  # contrast_factor
+                # (max(aug_params1[7], aug_params2[7]) / min(aug_params1[7], aug_params2[7]) - 1) * 50,  # saturation_factor
+                # max(aug_params1[8], aug_params2[8]) - min(aug_params1[8], aug_params2[8]) - 0.5,  # hue_factor
+                # aug_params1[5] / aug_params2[5] - 1,  # brightness_factor
+                # aug_params1[6] / aug_params2[6] - 1,  # contrast_factor
+                # aug_params1[7] / aug_params2[7] - 1,  # saturation_factor
+                # aug_params1[8] - aug_params2[8],  # hue_factor
+                aug_params1[5] / aug_params2[5] / 2,  # brightness_factor
+                aug_params1[6] / aug_params2[6] / 2,  # contrast_factor
+                aug_params1[7] / aug_params2[7] / 2,  # saturation_factor
+                (aug_params1[8] - aug_params2[8] + 0.3) * 2,  # hue_factor
+                # float(aug_params1[5] or aug_params2[5]),  # color jitter
+                float(aug_params1[9] or aug_params2[9])  # grayscale
             ]
+            # Debug:
+            # print(aug_params1[5] / aug_params2[5], aug_params1[6] / aug_params2[6], aug_params1[7] / aug_params2[7], aug_params1[8] - aug_params2[8])
+            # print(aug_params1[5] / aug_params2[5] / 2, aug_params1[6] / aug_params2[6] / 2, aug_params1[7] / aug_params2[7] / 2, (aug_params1[8] - aug_params2[8] + 0.3) * 2)
         else:
             sample['image'] = img
             sample['image_augmented'] = self.augmentation_transform(image)
@@ -71,6 +87,16 @@ class AugmentedDataset(Dataset):
         # aug_transforms_ = torchvision.transforms.Compose(self.augmentation_transform.transforms[:4])
         # image_ = transforms_(image)
         # aug_image_ = aug_transforms_(image)
+
+        # Debug:
+        # from transformations import UnNormalize
+        # unNorm = UnNormalize(mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010))  # cifar 10
+        # I1 = unNorm(sample['image'])
+        # I2 = unNorm(sample['image_augmented'])
+        # import matplotlib.pyplot as plt
+        # plt.imshow(I1.numpy().transpose((1,2,0)))
+        # plt.show()
+        # print(sample['aug_labels'])
 
         return sample
 

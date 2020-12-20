@@ -256,7 +256,7 @@ def get_train_transformations(p):
             shaked_transforms.RandomResizedCrop(**p['augmentation_kwargs']['random_resized_crop']),  # IOU
             shaked_transforms.RandomHorizontalFlip(),  # XOR
             shaked_transforms.RandomApply([  # OR
-                transforms.ColorJitter(**p['augmentation_kwargs']['color_jitter'])
+                shaked_transforms.ColorJitter(**p['augmentation_kwargs']['color_jitter'])
             ], p=p['augmentation_kwargs']['color_jitter_random_apply']['p']),
             shaked_transforms.RandomGrayscale(**p['augmentation_kwargs']['random_grayscale']),  # OR
             transforms.ToTensor(),

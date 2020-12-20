@@ -28,7 +28,14 @@ class ContrastiveModel(nn.Module):
 
         if self.add_augs_loss:
             self.augs_head = nn.Sequential(nn.Linear(self.backbone_dim * 2, augs_loss_dim),
-                                           nn.Sigmoid())
+                                           nn.Sigmoid())#.Tanh())
+            # self.augs_head1 = nn.Sequential(nn.Linear(self.backbone_dim, 64), nn.ReLU())
+            # self.augs_head2 = nn.Sequential(nn.Linear(64 * 2, augs_loss_dim), nn.Sigmoid())
+            #
+            # # self.augs_head = nn.Sequential(nn.Linear(self.backbone_dim * 2, self.backbone_dim // 4),
+            # #                                nn.ReLU(),
+            # #                                nn.Linear(self.backbone_dim // 4, augs_loss_dim),
+            # #                                nn.Sigmoid())#.Tanh())
             # self.augs_head = nn.Linear(self.backbone_dim * 2, augs_loss_dim)
 
     def forward(self, x):
@@ -36,7 +43,9 @@ class ContrastiveModel(nn.Module):
         features = self.contrastive_head(b)
         features = F.normalize(features, dim=1)
         if self.add_augs_loss and self.training:
-            # feature_pairs = b.view(2, b.size(0) // 2, -1)
+            # augs1 = self.augs_head1(b)
+            # augs1_ = augs1.view(2, b.size(0) // 2, -1).permute((1,0,2)).reshape(-1, 64 * 2)  # TODO: Simplify
+            # augs_features = self.augs_head2(augs1_)
             feature_pairs = b.view(2, b.size(0) // 2, -1).permute((1,0,2)).reshape(-1, self.backbone_dim * 2)  # TODO: Simplify
             augs_features = self.augs_head(feature_pairs)
             return features, augs_features

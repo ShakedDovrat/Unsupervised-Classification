@@ -59,9 +59,9 @@ transformation_kwargs:
 # augs aux loss
 add_augs_loss: True
 augs_loss_params:
-   criterion: MSELoss #L1Loss
-   scale: 3.0
-   dim: 4 #3
+   criterion: MSELoss #BCELoss #L1Loss
+   scale: 10.0 #3.0
+   dim: 7 #4 #3
 
 # Training
 num_epochs_per_eval: 4

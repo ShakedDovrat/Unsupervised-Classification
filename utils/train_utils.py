@@ -21,11 +21,19 @@ def simclr_train(train_loader, model, criterion, optimizer, epoch, augs_criterio
         augs_losses = AverageMeter('Augs Loss', ':.4e')
         augs_iou_abs_diffs = AverageMeter('Augs IoU abs-diff', ':.4f')
         augs_flip_accs = AverageMeter('Augs flip acc', ':.2f')
-        augs_color_jitter_accs = AverageMeter('Augs jitter acc', ':.2f')
+        augs_brightness_abs_diffs = AverageMeter('Augs brightness abs-diff', ':.4f')
+        augs_contrast_abs_diffs = AverageMeter('Augs contrast abs-diff', ':.4f')
+        augs_saturation_abs_diffs = AverageMeter('Augs saturation abs-diff', ':.4f')
+        augs_hue_abs_diffs = AverageMeter('Augs hue abs-diff', ':.4f')
+        # augs_color_jitter_accs = AverageMeter('Augs jitter acc', ':.2f')
         augs_grayscale_accs = AverageMeter('Augs gray acc', ':.2f')
         progress = ProgressMeter(len(train_loader),
-                                 [losses, augs_losses, augs_iou_abs_diffs, augs_flip_accs, augs_color_jitter_accs, augs_grayscale_accs],
+                                 [losses, augs_losses, augs_iou_abs_diffs, augs_flip_accs, augs_brightness_abs_diffs, augs_contrast_abs_diffs,
+                                  augs_saturation_abs_diffs, augs_hue_abs_diffs, augs_grayscale_accs],
                                  prefix="Epoch: [{}]".format(epoch))
+        # progress = ProgressMeter(len(train_loader),
+        #                          [losses, augs_losses, augs_iou_abs_diffs, augs_flip_accs, augs_color_jitter_accs, augs_grayscale_accs],
+        #                          prefix="Epoch: [{}]".format(epoch))
 
     model.train()
 
@@ -59,15 +67,29 @@ def simclr_train(train_loader, model, criterion, optimizer, epoch, augs_criterio
             augs_loss = augs_criterion(augs_output, aug_targets)
             augs_losses.update(augs_loss.item())
             loss = sum([loss, augs_loss])
+            # loss = augs_loss  # TEMP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
             abs_diff = torch.abs(augs_output - aug_targets)
             augs_iou_abs_diff = abs_diff[:, 0].mean().item()
             # assert ((aug_targets[:, 1:] == 0) | (aug_targets[:, 1:] == 1)).all().item()
-            augs_res = (abs_diff[:, 1:] < 0.5).float().mean(axis=0)
+
+            flip_acc = (abs_diff[:, 1] < 0.5).float().mean()
+            gray_acc = (abs_diff[:, 6] < 0.5).float().mean()
+            mean_abs_diff = abs_diff[:, 2:6].mean(axis=0)
+            augs_brightness_abs_diffs.update(mean_abs_diff[0].item())
+            augs_contrast_abs_diffs.update(mean_abs_diff[1].item())
+            augs_saturation_abs_diffs.update(mean_abs_diff[2].item())
+            augs_hue_abs_diffs.update(mean_abs_diff[3].item())
             augs_iou_abs_diffs.update(augs_iou_abs_diff)
-            augs_flip_accs.update(augs_res[0].item() * 100)
-            augs_color_jitter_accs.update(augs_res[1].item() * 100)
-            augs_grayscale_accs.update(augs_res[2].item() * 100)
+            augs_flip_accs.update(flip_acc.item() * 100)
+            augs_grayscale_accs.update(gray_acc.item() * 100)
+            # augs_res = (abs_diff[:, 1:] < 0.5).float().mean(axis=0)
+            # augs_iou_abs_diffs.update(augs_iou_abs_diff)
+            # augs_flip_accs.update(augs_res[0].item() * 100)
+            # augs_color_jitter_accs.update(augs_res[1].item() * 100)
+            # augs_grayscale_accs.update(augs_res[2].item() * 100)
+            #
+            # augs_grayscale_accs.update((abs_diff < 0.5).float().mean() * 100)
 
         optimizer.zero_grad()
         loss.backward()

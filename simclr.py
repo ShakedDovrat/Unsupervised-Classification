@@ -82,6 +82,8 @@ def main():
             augs_criterion = ScaledL1Loss(p['augs_loss_params']['scale'])
         elif p['augs_loss_params']['criterion'] == 'MSELoss':
             augs_criterion = ScaledMSELoss(p['augs_loss_params']['scale'])
+        elif p['augs_loss_params']['criterion'] == 'BCELoss':
+            augs_criterion = torch.nn.BCELoss()
         else:
             raise ValueError('Unrecognized criterion {}'.format(p['augs_loss_params']['criterion']))
         augs_criterion.cuda()
